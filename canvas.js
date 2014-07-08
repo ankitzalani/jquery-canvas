@@ -3,21 +3,66 @@
  */
 (function($) {
 	$.fn.canvas = function(options) {
-		this.ht
-		
-		var $container = this;
+		var $main = this;
+		var temp = this.html();
+		this.html('');
+		$main.addClass("ui-canvas");
 
+		$(
+				"<div class='ui-canvas-sidebar-wrapper'><span class='ui-canvas-sidebar'>Canvas</span></div>")
+				.appendTo($main);
+
+		$("<div>").addClass("ui-canvas-header").appendTo($main);
+
+		$("<div>").addClass("ui-canvas-container").appendTo($main);
+
+		var $container = $('.ui-canvas-container', $main);
+		var $sidebar = $('.ui-canvas-sidebar', $main);
+		var $header = $('.ui-canvas-header', $main);
+
+		$container.html(temp);
 		var settings = $.extend({
-			border : "2px solid blue",
 			width : "100px",
 			height : "100px",
 			backgroundColor : "#EAEAEA"
 		}, options);
 
 		init = function() {
-			$container.css("width", settings.width);
-			$container.css("height", settings.height);
-			$container.css("border", '1px solid #CCC');
+			header($header);
+			fixDimention();
+
+		};
+
+		header = function(toolbar) {
+			var table = document.createElement('table');
+			var tr = document.createElement('tr');
+
+			for ( var i = 1; i < 2; i++) {
+				var td = document.createElement('td');
+				td.innerHTML = "B";
+				td.bind('click', function() {
+					alert('asdf');
+				});
+				tr.appendChild(td);
+			}
+
+			table.appendChild(tr);
+			toolbar.html(table);
+		};
+
+		toolbarButtonBold = function() {
+			alert('bold');
+		};
+
+		fixDimention = function() {
+			$main.css("width", settings.width);
+			$main.css("height", settings.height);
+
+			$header.css("width", $main.width() - $sidebar.height() - 8);
+			$header.css("left", $sidebar.height() + 5);
+
+			$container.css("width", $main.width() - $sidebar.height() - 8);
+			$container.css("height", $main.height() - $header.height());
 		};
 
 		isEditable = function() {
@@ -25,26 +70,24 @@
 		};
 
 		editable = function() {
-			$container.css("background-color", settings.backgroundColor);
 			$container.prop('contenteditable', true);
-			$container.css("border", settings.border);
+			$container.removeClass('readonly');
+			$container.addClass('editable');
 		};
 
 		readonly = function() {
-			$container.css("background-color", "white");
 			$container.prop('contenteditable', false);
-			$container.css("border", '1px solid #CCC');
+			$container.removeClass('editable');
+			$container.addClass('readonly');
 		};
 
 		init();
-		
-		$container.on('focusout',function(){
-			console.log('focusout');
+
+		$container.on('focusout', function() {
 			readonly();
 		});
-		
-		$container.on('click',function(){
-			console.log('doubleclick');
+
+		$container.on('click', function() {
 			editable();
 		});
 
