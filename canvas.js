@@ -16,11 +16,11 @@
 
 		$("<div>").addClass("ui-canvas-container").appendTo($main);
 
-		var $container = $('.ui-canvas-container', $main);
-		var $sidebar = $('.ui-canvas-sidebar', $main);
-		var $header = $('.ui-canvas-header', $main);
+		var container = $('.ui-canvas-container', $main);
+		var sidebar = $('.ui-canvas-sidebar-wrapper', $main);
+		var header = $('.ui-canvas-header', $main);
 
-		$container.html(temp);
+		container.html(temp);
 		var settings = $.extend({
 			width : "100px",
 			height : "100px",
@@ -28,25 +28,23 @@
 		}, options);
 
 		init = function() {
-			header($header);
+			toolsbar(header);
 			fixDimention();
 
 		};
 
-		header = function(toolbar) {
-			var table = document.createElement('table');
-			var tr = document.createElement('tr');
+		toolsbar = function(toolbar) {
+			var table = $('<table></table>').addClass('toolbar-buttons');
+			var tr = $('<tr></tr>');
 
 			for ( var i = 1; i < 2; i++) {
-				var td = document.createElement('td');
-				td.innerHTML = "B";
-				td.bind('click', function() {
-					alert('asdf');
-				});
-				tr.appendChild(td);
+				var td = $('<td></td>');
+				td.html("B");
+				td.bind('click', toolbarButtonBold);
+				tr.html(td);
 			}
 
-			table.appendChild(tr);
+			table.append(tr);
 			toolbar.html(table);
 		};
 
@@ -58,38 +56,65 @@
 			$main.css("width", settings.width);
 			$main.css("height", settings.height);
 
-			$header.css("width", $main.width() - $sidebar.height() - 8);
-			$header.css("left", $sidebar.height() + 5);
+			header.css("width", $main.width() - sidebar.height());
+			header.css("left", sidebar.width());
 
-			$container.css("width", $main.width() - $sidebar.height() - 8);
-			$container.css("height", $main.height() - $header.height());
+			container.css("width", $main.width() - sidebar.height());
+			container.css("height", $main.height() - header.height() - 3);
+		};
+
+		var getSelectedText = function() {
+			if (window.getSelection) {
+				return window.getSelection().toString();
+			} else if (document.getSelection) {
+				return document.getSelection();
+			} else if (document.selection) {
+
+				return document.selection.createRange().text;
+			}
+		}
+
+		var test = function() {
+			container.on("mouseup", function() {
+				selection = getSelectedText();
+				if (selection.length >= 3) {
+					console.log($(this))
+					/*
+					 * $(this).html( $(this).html().replace(selection, $('<\/span>').attr({
+					 * 'class' : 'hl' }).html(selection).parent().html()));
+					 */
+					alert(selection);
+				}
+			});
 		};
 
 		isEditable = function() {
-			return $container.is('.editable');
+			return container.is('.editable');
 		};
 
 		editable = function() {
-			$container.prop('contenteditable', true);
-			$container.removeClass('readonly');
-			$container.addClass('editable');
+			container.prop('contenteditable', true);
+			container.removeClass('readonly');
+			container.addClass('editable');
 		};
 
 		readonly = function() {
-			$container.prop('contenteditable', false);
-			$container.removeClass('editable');
-			$container.addClass('readonly');
+			container.prop('contenteditable', false);
+			container.removeClass('editable');
+			container.addClass('readonly');
 		};
 
 		init();
 
-		$container.on('focusout', function() {
-			readonly();
-		});
+		/*
+		 * container.on('focusout', function() { readonly(); });
+		 * 
+		 * container.on('click', function() { editable(); });
+		 */
 
-		$container.on('click', function() {
-			editable();
-		});
+		container.prop('contenteditable', true); // must be removed later.
+
+		test();
 
 		return this;
 	};
